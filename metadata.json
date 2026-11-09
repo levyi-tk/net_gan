@@ -1,0 +1,6 @@
+{
+  "name": "GanNet - Early Childhood Management System",
+  "description": "Bilingual preschool and kindergarten management platform for teachers, operating contractors, and municipalities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
