@@ -107,3 +107,138 @@ export interface DailyLogPost {
   likes: number;
   commentsCount: number;
 }
+
+export interface ContractorClassSession {
+  id: string;
+  kindergartenNameHe: string;
+  kindergartenNameEn: string;
+  cityHe: string;
+  cityEn: string;
+  addressHe: string;
+  addressEn: string;
+  teacherId: string;
+  teacherNameHe: string;
+  teacherNameEn: string;
+  teacherPhone: string;
+  subjectHe: string;
+  subjectEn: string;
+  ageGroupHe: string;
+  ageGroupEn: string;
+  scheduledTime: string;
+  status: 'active' | 'completed' | 'upcoming';
+  timerSecondsElapsed: number;
+  timerTotalDurationMinutes: number;
+  isTimerRunning: boolean;
+  gpsStatus: 'verified' | 'out_of_range' | 'pending';
+  gpsDistanceMeters: number;
+  gpsTimestamp?: string;
+  attendanceCount: number;
+  totalStudents: number;
+  hasLogSubmitted: boolean;
+  contactPersonHe: string;
+  contactPersonEn: string;
+  contactPhone: string;
+}
+
+export interface TeacherFinancialRecord {
+  id: string;
+  teacherNameHe: string;
+  teacherNameEn: string;
+  subjectHe: string;
+  subjectEn: string;
+  phone: string;
+  completedClasses: number;
+  percentageSplit: number;
+  seniorityLevelHe: string;
+  seniorityLevelEn: string;
+  isPayrollApproved: boolean;
+}
+
+export interface ContractorAlertItem {
+  id: string;
+  type: 'late_checkin' | 'missing_log' | 'gps_anomaly';
+  severity: 'urgent' | 'warning' | 'info';
+  teacherId: string;
+  teacherNameHe: string;
+  teacherNameEn: string;
+  teacherPhone: string;
+  kindergartenNameHe: string;
+  kindergartenNameEn: string;
+  timeSlot: string;
+  messageHe: string;
+  messageEn: string;
+  detectedAt: string;
+  status: 'active' | 'resolved';
+}
+
+export interface InstructorItem {
+  id: string;
+  nameHe: string;
+  nameEn: string;
+  roleHe: string;
+  roleEn: string;
+  subjectHe: string;
+  subjectEn: string;
+  phone: string;
+  email: string;
+  zone: 'north' | 'center' | 'south';
+  status: 'active' | 'standby' | 'sick' | 'inactive';
+  seniorityHe: string;
+  seniorityEn: string;
+  defaultSplit: number; // e.g. 60
+  avatarBg?: string;
+  notes?: string;
+  assignedFacilitiesCount?: number;
+}
+
+export interface EducationalFacility {
+  id: string;
+  nameHe: string;
+  nameEn: string;
+  cityHe: string;
+  cityEn: string;
+  addressHe: string;
+  addressEn: string;
+  zone: 'north' | 'center' | 'south';
+  contactPersonHe: string;
+  contactPersonEn: string;
+  contactPhone: string;
+  contactEmail?: string;
+  ageGroupHe: string;
+  ageGroupEn: string;
+  totalStudents: number;
+  geofenceRadiusMeters: number;
+  notes?: string;
+  assignedInstructorsCount?: number;
+}
+
+export interface ClassPlacementAssignment {
+  id: string;
+  facilityId: string;
+  facilityNameHe: string;
+  facilityNameEn: string;
+  cityHe: string;
+  cityEn: string;
+  addressHe: string;
+  addressEn: string;
+  instructorId: string;
+  instructorNameHe: string;
+  instructorNameEn: string;
+  instructorPhone: string;
+  subjectHe: string;
+  subjectEn: string;
+  ageGroupHe: string;
+  ageGroupEn: string;
+  scheduleType: 'recurring_weekly' | 'specific_date';
+  specificDate?: string; // YYYY-MM-DD
+  dayOfWeek: number; // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri
+  recurringWeekdays?: number[]; // [0, 2] for Sun + Tue
+  startTime: string; // 24h format "14:00"
+  endTime: string;   // 24h format "15:30"
+  ratePerClass: number; // ₪350
+  teacherSplit: number; // 60%
+  status: 'active' | 'upcoming' | 'completed';
+  contactPersonHe: string;
+  contactPersonEn: string;
+  contactPhone: string;
+}

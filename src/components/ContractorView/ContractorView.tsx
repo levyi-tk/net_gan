@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ContractorTab } from '../../types';
+import {
+  ContractorTab,
+  InstructorItem,
+  EducationalFacility,
+  ClassPlacementAssignment,
+  ContractorClassSession
+} from '../../types';
 import {
   LayoutDashboard,
   Users2,
@@ -19,85 +25,246 @@ import {
   Clock,
   Sparkles,
   RefreshCw,
+  FileSpreadsheet,
+  Coins,
+  TrendingUp,
+  MapPin,
+  Radio,
+  Phone,
   Plus,
-  FileSpreadsheet
+  CalendarPlus,
+  Building2
 } from 'lucide-react';
+import { ContractorOverviewGrid } from './ContractorOverviewGrid';
+import { FinancialSplitManager } from './FinancialSplitManager';
+import { OperationalAlertsBanner } from './OperationalAlertsBanner';
+import { StaffCrudTab } from './StaffCrudTab';
+import { FacilitiesCrudTab } from './FacilitiesCrudTab';
+import { PlacementsTab } from './PlacementsTab';
+import { InstructorModal } from './InstructorModal';
+import { FacilityModal } from './FacilityModal';
+import { PlacementModal } from './PlacementModal';
+import {
+  initialContractorClasses,
+  initialTeacherFinancials,
+  initialContractorAlerts,
+  initialInstructorsList,
+  initialFacilitiesList,
+  initialAssignmentsList,
+  INITIAL_MUNICIPAL_CLASS_RATE,
+  DEFAULT_TEACHER_PERCENTAGE
+} from '../../data/mockContractor';
 
 export const ContractorView: React.FC = () => {
   const { contractorTab, setContractorTab, t, language, showToast } = useApp();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterZone, setFilterZone] = useState<'all' | 'north' | 'center' | 'south'>('all');
+
+  // State for CRUD resources
+  const [instructors, setInstructors] = useState<InstructorItem[]>(initialInstructorsList);
+  const [facilities, setFacilities] = useState<EducationalFacility[]>(initialFacilitiesList);
+  const [placements, setPlacements] = useState<ClassPlacementAssignment[]>(initialAssignmentsList);
+  const [classes, setClasses] = useState<ContractorClassSession[]>(initialContractorClasses);
+
+  // Modals state
+  const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);
+  const [instructorToEdit, setInstructorToEdit] = useState<InstructorItem | null>(null);
+
+  const [isFacilityModalOpen, setIsFacilityModalOpen] = useState(false);
+  const [facilityToEdit, setFacilityToEdit] = useState<EducationalFacility | null>(null);
+
+  const [isPlacementModalOpen, setIsPlacementModalOpen] = useState(false);
+  const [placementToEdit, setPlacementToEdit] = useState<ClassPlacementAssignment | null>(null);
+  const [placementPrefillInstId, setPlacementPrefillInstId] = useState<string | undefined>();
+  const [placementPrefillFacId, setPlacementPrefillFacId] = useState<string | undefined>();
+
+  // Sub-view toggle in shifts: 'placements' or 'live_grid'
+  const [shiftsSubView, setShiftsSubView] = useState<'placements' | 'live_grid'>('placements');
 
   const navItems: { id: ContractorTab; label: string; icon: React.FC<{ className?: string }> }[] = [
     { id: 'overview', label: t.nav.overview, icon: LayoutDashboard },
-    { id: 'staff', label: t.nav.staffManagement, icon: Users2 },
-    { id: 'kindergartens', label: t.nav.kindergartens, icon: Building },
-    { id: 'shifts', label: t.nav.operationsShifts, icon: CalendarClock },
-    { id: 'invoicing', label: t.nav.reportsInvoicing, icon: Receipt },
+    { id: 'shifts', label: language === 'he' ? 'שיבוצים ושעות שהות' : 'Placements & Schedule', icon: CalendarClock },
+    { id: 'staff', label: language === 'he' ? 'ניהול מדריכים (CRUD)' : 'Instructors (CRUD)', icon: Users2 },
+    { id: 'kindergartens', label: language === 'he' ? 'ניהול גנים ומוסדות (CRUD)' : 'Facilities (CRUD)', icon: Building },
+    { id: 'invoicing', label: language === 'he' ? 'פיצול שכר וחיובים' : 'Financial Split & Invoicing', icon: Receipt },
     { id: 'settings', label: t.nav.settings, icon: Settings },
   ];
 
-  // Realistic sample staff deployments
-  const staffList = [
-    {
-      id: '1',
-      name: language === 'he' ? 'רונית כהן' : 'Ronit Cohen',
-      role: language === 'he' ? 'גננת מובילה' : 'Lead Teacher',
-      kindergarten: language === 'he' ? 'גן שושנים (ת״א צפון)' : 'Shoshanim (North TLV)',
-      zone: 'north',
-      phone: '050-8472911',
-      status: 'active',
-      checkInTime: '07:28',
-    },
-    {
-      id: '2',
-      name: language === 'he' ? 'עידן מור' : 'Idan Mor',
-      role: language === 'he' ? 'מדריך תנועה ומוזיקה' : 'Music & Movement Instructor',
-      kindergarten: language === 'he' ? 'גן שושנים / גן יסמין' : 'Shoshanim / Yasmin',
-      zone: 'north',
-      phone: '052-3349102',
-      status: 'active',
-      checkInTime: '09:15',
-    },
-    {
-      id: '3',
-      name: language === 'he' ? 'שירה אלבז' : 'Shira Elbaz',
-      role: language === 'he' ? 'סייעת פדגוגית' : 'Teaching Aide',
-      kindergarten: language === 'he' ? 'גן אלונים (חולון)' : 'Alonim (Holon)',
-      zone: 'center',
-      phone: '054-9981203',
-      status: 'sick',
-      checkInTime: '--:--',
-    },
-    {
-      id: '4',
-      name: language === 'he' ? 'יוסף נג׳אר' : 'Youssef Najjar',
-      role: language === 'he' ? 'מדריך רובוטיקה והעשרה' : 'Robotics Instructor',
-      kindergarten: language === 'he' ? 'גן גומא (יפו)' : 'Goma (Jaffa)',
-      zone: 'south',
-      phone: '053-1124509',
-      status: 'active',
-      checkInTime: '08:02',
-    },
-    {
-      id: '5',
-      name: language === 'he' ? 'דנה אשכנזי' : 'Dana Ashkenazi',
-      role: language === 'he' ? 'כוננית גיבוי / ממלאת מקום' : 'Standby Substitute',
-      kindergarten: language === 'he' ? 'כוננות אשכול מרכז' : 'Center Standby Pool',
-      zone: 'center',
-      phone: '050-4491022',
-      status: 'standby',
-      checkInTime: '07:00',
-    },
-  ];
+  // -------------------------------------------------------------
+  // Instructor CRUD Handlers
+  // -------------------------------------------------------------
+  const handleOpenAddInstructor = () => {
+    setInstructorToEdit(null);
+    setIsInstructorModalOpen(true);
+  };
 
-  const filteredStaff = staffList.filter((item) => {
-    const matchesSearch =
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.kindergarten.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesZone = filterZone === 'all' || item.zone === filterZone;
-    return matchesSearch && matchesZone;
-  });
+  const handleOpenEditInstructor = (instructor: InstructorItem) => {
+    setInstructorToEdit(instructor);
+    setIsInstructorModalOpen(true);
+  };
+
+  const handleSaveInstructor = (savedInstructor: InstructorItem) => {
+    setInstructors((prev) => {
+      const exists = prev.some((i) => i.id === savedInstructor.id);
+      if (exists) {
+        return prev.map((i) => (i.id === savedInstructor.id ? savedInstructor : i));
+      }
+      return [savedInstructor, ...prev];
+    });
+    setIsInstructorModalOpen(false);
+    showToast(t.contractorView.instructorSavedToast, 'success');
+  };
+
+  const handleDeleteInstructor = (instructorId: string) => {
+    setInstructors((prev) => prev.filter((i) => i.id !== instructorId));
+    // Also remove any active placements for this instructor
+    setPlacements((prev) => prev.filter((p) => p.instructorId !== instructorId));
+    showToast(t.contractorView.instructorDeletedToast, 'info');
+  };
+
+  // -------------------------------------------------------------
+  // Facility CRUD Handlers
+  // -------------------------------------------------------------
+  const handleOpenAddFacility = () => {
+    setFacilityToEdit(null);
+    setIsFacilityModalOpen(true);
+  };
+
+  const handleOpenEditFacility = (facility: EducationalFacility) => {
+    setFacilityToEdit(facility);
+    setIsFacilityModalOpen(true);
+  };
+
+  const handleSaveFacility = (savedFacility: EducationalFacility) => {
+    setFacilities((prev) => {
+      const exists = prev.some((f) => f.id === savedFacility.id);
+      if (exists) {
+        return prev.map((f) => (f.id === savedFacility.id ? savedFacility : f));
+      }
+      return [savedFacility, ...prev];
+    });
+    setIsFacilityModalOpen(false);
+    showToast(t.contractorView.facilitySavedToast, 'success');
+  };
+
+  const handleDeleteFacility = (facilityId: string) => {
+    setFacilities((prev) => prev.filter((f) => f.id !== facilityId));
+    // Also remove any active placements for this facility
+    setPlacements((prev) => prev.filter((p) => p.facilityId !== facilityId));
+    showToast(t.contractorView.facilityDeletedToast, 'info');
+  };
+
+  // -------------------------------------------------------------
+  // Placement / Assignment CRUD Handlers
+  // -------------------------------------------------------------
+  const handleOpenAddPlacement = (prefillInstId?: string, prefillFacId?: string) => {
+    setPlacementToEdit(null);
+    setPlacementPrefillInstId(prefillInstId);
+    setPlacementPrefillFacId(prefillFacId);
+    setIsPlacementModalOpen(true);
+  };
+
+  const handleOpenEditPlacement = (placement: ClassPlacementAssignment) => {
+    setPlacementToEdit(placement);
+    setIsPlacementModalOpen(true);
+  };
+
+  const handleSavePlacement = (savedPlacement: ClassPlacementAssignment) => {
+    setPlacements((prev) => {
+      const exists = prev.some((p) => p.id === savedPlacement.id);
+      if (exists) {
+        return prev.map((p) => (p.id === savedPlacement.id ? savedPlacement : p));
+      }
+      return [savedPlacement, ...prev];
+    });
+
+    // Also inject/update into active classes grid
+    setClasses((prev) => {
+      const newClass: ContractorClassSession = {
+        id: `c-${savedPlacement.id}`,
+        kindergartenNameHe: savedPlacement.facilityNameHe,
+        kindergartenNameEn: savedPlacement.facilityNameEn,
+        cityHe: savedPlacement.cityHe,
+        cityEn: savedPlacement.cityEn,
+        addressHe: savedPlacement.addressHe,
+        addressEn: savedPlacement.addressEn,
+        teacherId: savedPlacement.instructorId,
+        teacherNameHe: savedPlacement.instructorNameHe,
+        teacherNameEn: savedPlacement.instructorNameEn,
+        teacherPhone: savedPlacement.instructorPhone,
+        subjectHe: savedPlacement.subjectHe,
+        subjectEn: savedPlacement.subjectEn,
+        ageGroupHe: savedPlacement.ageGroupHe,
+        ageGroupEn: savedPlacement.ageGroupEn,
+        scheduledTime: `${savedPlacement.startTime} - ${savedPlacement.endTime}`,
+        status: 'upcoming',
+        timerSecondsElapsed: 0,
+        timerTotalDurationMinutes: 75,
+        isTimerRunning: false,
+        gpsStatus: 'pending',
+        gpsDistanceMeters: 0,
+        attendanceCount: 0,
+        totalStudents: 20,
+        hasLogSubmitted: false,
+        contactPersonHe: savedPlacement.contactPersonHe,
+        contactPersonEn: savedPlacement.contactPersonEn,
+        contactPhone: savedPlacement.contactPhone,
+      };
+      return [newClass, ...prev.filter((c) => c.id !== newClass.id)];
+    });
+
+    // Update count metrics
+    setInstructors((prev) =>
+      prev.map((i) =>
+        i.id === savedPlacement.instructorId
+          ? { ...i, assignedFacilitiesCount: (i.assignedFacilitiesCount || 0) + 1 }
+          : i
+      )
+    );
+
+    setFacilities((prev) =>
+      prev.map((f) =>
+        f.id === savedPlacement.facilityId
+          ? { ...f, assignedInstructorsCount: (f.assignedInstructorsCount || 0) + 1 }
+          : f
+      )
+    );
+
+    setIsPlacementModalOpen(false);
+    showToast(t.contractorView.placementSavedToast, 'success');
+  };
+
+  const handleDeletePlacement = (placementId: string) => {
+    setPlacements((prev) => prev.filter((p) => p.id !== placementId));
+    setClasses((prev) => prev.filter((c) => c.id !== `c-${placementId}`));
+    showToast(t.contractorView.placementDeletedToast, 'info');
+  };
+
+  // Call actions
+  const handleCallTeacher = (teacherName: string, phone: string) => {
+    showToast(
+      language === 'he'
+        ? `מחייג למדריך/ה ${teacherName} (${phone})...`
+        : `Calling instructor ${teacherName} (${phone})...`,
+      'info'
+    );
+  };
+
+  const handleCallKindergarten = (kindergartenName: string, phone: string) => {
+    showToast(
+      language === 'he'
+        ? `מחייג לגן ${kindergartenName} (${phone})...`
+        : `Calling kindergarten ${kindergartenName} (${phone})...`,
+      'info'
+    );
+  };
+
+  const handleDispatchSubstitute = () => {
+    showToast(
+      language === 'he'
+        ? 'הכוננית דנה אשכנזי שובצה לגן המבוקש!'
+        : 'Standby aide Dana Ashkenazi dispatched!',
+      'success'
+    );
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
@@ -118,22 +285,33 @@ export const ContractorView: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Quick Action Buttons */}
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
-              onClick={() => showToast(language === 'he' ? 'נתוני הפריסה רועננו בהצלחה' : 'Deployment data refreshed', 'success')}
-              className="px-3 py-2 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition-colors"
+              onClick={() => handleOpenAddPlacement()}
+              className="px-3.5 py-2 text-xs font-bold rounded-xl bg-teal-600 hover:bg-teal-700 text-white flex items-center gap-1.5 transition-colors shadow-2xs"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>{t.actions.refreshData}</span>
+              <CalendarPlus className="w-4 h-4" />
+              <span>{language === 'he' ? 'שבץ מדריך לגן' : 'Assign to Facility'}</span>
             </button>
+
             <button
               type="button"
-              onClick={() => showToast(language === 'he' ? 'דוח שיבוצים יומי יוצא ל-CSV' : 'Daily roster exported to CSV', 'success')}
-              className="px-3.5 py-2 text-xs font-medium rounded-lg bg-teal-600 hover:bg-teal-700 text-white flex items-center gap-1.5 transition-colors shadow-2xs"
+              onClick={handleOpenAddInstructor}
+              className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition-colors"
             >
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>{t.actions.exportReport}</span>
+              <Plus className="w-3.5 h-3.5" />
+              <span>{language === 'he' ? 'הוסף מדריך' : 'New Instructor'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleOpenAddFacility}
+              className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition-colors"
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>{language === 'he' ? 'הוסף גן' : 'New Facility'}</span>
             </button>
           </div>
         </div>
@@ -142,59 +320,59 @@ export const ContractorView: React.FC = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
             <div className="text-xs text-slate-500 font-medium">
-              {language === 'he' ? 'מדריכים פעילים בשטח' : 'Active Field Staff'}
+              {language === 'he' ? 'מדריכים רשומים במערכת' : 'Total Instructors'}
             </div>
             <div className="text-2xl font-bold text-slate-900 mt-1 tabular-nums font-mono">
-              {t.contractorView.activeInstructors}
+              {instructors.length}
             </div>
             <div className="text-[11px] text-teal-700 font-medium mt-1 flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{t.contractorView.activeInstructorsSub}</span>
+              <span>{instructors.filter((i) => i.status === 'active').length} {language === 'he' ? 'פעילים בשטח' : 'active'}</span>
             </div>
           </div>
 
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
             <div className="text-xs text-slate-500 font-medium">
-              {language === 'he' ? 'מוסדות וגנים בהפעלה' : 'Managed Preschools'}
+              {language === 'he' ? 'מוסדות וגנים בהסכם' : 'Managed Preschools'}
             </div>
             <div className="text-2xl font-bold text-slate-900 mt-1 tabular-nums font-mono">
-              {t.contractorView.managedPreschools}
-            </div>
-            <div className="text-[11px] text-slate-500 mt-1">
-              {t.contractorView.managedPreschoolsSub}
-            </div>
-          </div>
-
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div className="text-xs text-slate-500 font-medium">
-              {language === 'he' ? 'אחוז כיסוי שיבוצים יומי' : 'Daily Roster Coverage'}
-            </div>
-            <div className="text-2xl font-bold text-slate-900 mt-1 tabular-nums font-mono">
-              {t.contractorView.coverageRate}
+              {facilities.length}
             </div>
             <div className="text-[11px] text-teal-700 font-medium mt-1">
-              {t.contractorView.coverageRateSub}
+              {language === 'he' ? `${placements.length} שיבוצי חוגים שבועיים` : `${placements.length} weekly placements`}
+            </div>
+          </div>
+
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div className="text-xs text-slate-500 font-medium">
+              {language === 'he' ? 'תעריף שיעור עירוני' : 'Municipal Class Rate'}
+            </div>
+            <div className="text-2xl font-bold text-slate-900 mt-1 tabular-nums font-mono">
+              ₪{INITIAL_MUNICIPAL_CLASS_RATE}
+            </div>
+            <div className="text-[11px] text-teal-700 font-medium mt-1">
+              {language === 'he' ? `פיצול ממוצע: 60% מדריך / 40% קבלן` : `Avg split: 60% teacher / 40% agency`}
             </div>
           </div>
 
           <div className="bg-amber-50/70 p-4 rounded-xl border border-amber-200">
             <div className="text-xs text-amber-800 font-medium">
-              {language === 'he' ? 'בקשות החלפה פתוחות' : 'Open Substitute Requests'}
+              {language === 'he' ? 'התראות וחריגות שטח' : 'Active Field Alerts'}
             </div>
             <div className="text-2xl font-bold text-amber-900 mt-1 tabular-nums font-mono">
-              {t.contractorView.openSubstituteRequests}
+              3 {language === 'he' ? 'חריגות' : 'Alerts'}
             </div>
             <div className="text-[11px] text-amber-700 mt-1">
-              {t.contractorView.openSubstituteRequestsSub}
+              {language === 'he' ? '1 איחור, 1 יומן חסר, 1 GPS' : '1 Late, 1 Missing Log, 1 GPS'}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Workspace: Navigation Tabs + Content Panels */}
+      {/* Main Workspace: Navigation Sidebar + Content Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* Navigation Sidebar / Segmented Bar */}
+        {/* Navigation Sidebar */}
         <aside className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-2 shadow-2xs">
           <nav className="space-y-1">
             {navItems.map((item) => {
@@ -216,8 +394,18 @@ export const ContractorView: React.FC = () => {
                     <span>{item.label}</span>
                   </div>
                   {item.id === 'shifts' && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
-                      2
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-800 font-mono">
+                      {placements.length}
+                    </span>
+                  )}
+                  {item.id === 'staff' && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-800 font-mono">
+                      {instructors.length}
+                    </span>
+                  )}
+                  {item.id === 'kindergartens' && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-800 font-mono">
+                      {facilities.length}
                     </span>
                   )}
                 </button>
@@ -236,146 +424,217 @@ export const ContractorView: React.FC = () => {
         </aside>
 
         {/* Content Viewport */}
-        <div className="lg:col-span-9 space-y-4">
+        <div className="lg:col-span-9 space-y-6">
           
-          {/* Urgent Dispatch Notification Banner */}
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <div>
-                <h2 className="text-xs sm:text-sm font-bold text-amber-900">
-                  {t.contractorView.urgentNoticeTitle}
-                </h2>
-                <p className="text-xs text-amber-800 mt-0.5">
-                  {t.contractorView.urgentNoticeDesc}
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => showToast(language === 'he' ? 'הכוננית דנה אשכנזי שובצה בהצלחה לגן אלונים!' : 'Standby aide Dana Ashkenazi dispatched to Alonim!', 'success')}
-              className="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs whitespace-nowrap transition-colors shadow-2xs shrink-0"
-            >
-              {t.contractorView.dispatchAction}
-            </button>
-          </div>
+          {/* TAB 1: OVERVIEW */}
+          {contractorTab === 'overview' && (
+            <div className="space-y-6">
+              {/* Operational Alerts Component */}
+              <OperationalAlertsBanner
+                initialAlerts={initialContractorAlerts}
+                onCallTeacher={handleCallTeacher}
+                onDispatchSubstitute={handleDispatchSubstitute}
+              />
 
-          {/* Roster & Deployment Table */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-            
-            {/* Table Header & Search/Filter Controls */}
-            <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">
-                  {t.contractorView.deploymentStatusHeader}
-                </h2>
-                <p className="text-xs text-slate-500">
-                  {language === 'he' ? 'מעקב בזמן אמת אחר נוכחות מדריכים ושיבוצים' : 'Live tracking of instructor presence & facility placement'}
-                </p>
-              </div>
+              {/* Overview Grid Component: Active Classes with live timer & GPS badges */}
+              <ContractorOverviewGrid
+                classes={classes}
+                onCallTeacher={handleCallTeacher}
+                onCallKindergarten={handleCallKindergarten}
+              />
 
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1 sm:w-60">
-                  <Search className="w-4 h-4 text-slate-400 absolute start-2.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={t.actions.searchPlaceholder}
-                    className="w-full text-xs ps-8 pe-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
-                  />
+              {/* Quick Placement Manager Banner */}
+              <div className="bg-gradient-to-r from-teal-50 to-blue-50 border border-teal-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white text-teal-800 text-[11px] font-bold border border-teal-200">
+                    <CalendarClock className="w-3.5 h-3.5 text-teal-600" />
+                    <span>{language === 'he' ? 'שיבוץ והצמדת מדריך לגן' : 'Instructor Placement'}</span>
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    {language === 'he' ? 'הגדרת זמני שהות ושעות פעילות מדויקות בגנים' : 'Set Arrival Hours & School Site Placements'}
+                  </h3>
+                  <p className="text-xs text-slate-600">
+                    {language === 'he'
+                      ? 'הוסף מדריך למוסד יעד, הגדר שעת כניסה ושעת יציאה, ועדכן את תוכנית העבודה.'
+                      : 'Assign an instructor to a facility with specific arrival & departure hours and track execution.'}
+                  </p>
                 </div>
 
-                <select
-                  value={filterZone}
-                  onChange={(e) => setFilterZone(e.target.value as any)}
-                  className="text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-none"
+                <button
+                  type="button"
+                  onClick={() => handleOpenAddPlacement()}
+                  className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs whitespace-nowrap transition-colors shadow-2xs shrink-0 flex items-center gap-1.5"
                 >
-                  <option value="all">{language === 'he' ? 'כל המחוזות' : 'All Zones'}</option>
-                  <option value="north">{language === 'he' ? 'מחוז צפון' : 'North'}</option>
-                  <option value="center">{language === 'he' ? 'מחוז מרכז' : 'Center'}</option>
-                  <option value="south">{language === 'he' ? 'מחוז דרום' : 'South'}</option>
-                </select>
+                  <Plus className="w-4 h-4" />
+                  <span>{t.contractorView.addPlacement}</span>
+                </button>
               </div>
             </div>
+          )}
 
-            {/* Table Rows */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-start">
-                <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
-                  <tr>
-                    <th className="py-2.5 px-4 text-start font-semibold">{language === 'he' ? 'איש/אשת צוות' : 'Staff Member'}</th>
-                    <th className="py-2.5 px-4 text-start font-semibold">{language === 'he' ? 'תפקיד' : 'Role'}</th>
-                    <th className="py-2.5 px-4 text-start font-semibold">{language === 'he' ? 'מוסד מוצב' : 'Preschool'}</th>
-                    <th className="py-2.5 px-4 text-start font-semibold">{language === 'he' ? 'שעת כניסה' : 'Check-In'}</th>
-                    <th className="py-2.5 px-4 text-start font-semibold">{language === 'he' ? 'סטטוס' : 'Status'}</th>
-                    <th className="py-2.5 px-4 text-end font-semibold">{language === 'he' ? 'פעולה' : 'Action'}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {filteredStaff.map((staff) => (
-                    <tr key={staff.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="py-3 px-4 font-medium text-slate-900">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs">
-                            {staff.name.slice(0, 1)}
-                          </div>
-                          <span>{staff.name}</span>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-slate-600">{staff.role}</td>
-                      <td className="py-3 px-4 text-slate-700 font-medium">{staff.kindergarten}</td>
-                      <td className="py-3 px-4 text-slate-600 font-mono tabular-nums">{staff.checkInTime}</td>
-                      <td className="py-3 px-4">
-                        {staff.status === 'active' ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">
-                            <CheckCircle2 className="w-3 h-3" />
-                            {language === 'he' ? 'במשמרת' : 'On Shift'}
-                          </span>
-                        ) : staff.status === 'sick' ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
-                            <UserX className="w-3 h-3" />
-                            {language === 'he' ? 'דיווח מחלה' : 'Sick Leave'}
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
-                            <UserCheck className="w-3 h-3" />
-                            {language === 'he' ? 'כוננות זמינה' : 'On Standby'}
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 text-end">
-                        <button
-                          type="button"
-                          onClick={() => showToast(`${language === 'he' ? 'פתיחת כרטיס עבור' : 'Opening profile for'} ${staff.name}`, 'info')}
-                          className="text-xs text-teal-700 hover:text-teal-900 font-medium hover:underline"
-                        >
-                          {t.actions.viewDetails}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          {/* TAB 2: PLACEMENTS & SCHEDULE (SHIFTS) */}
+          {contractorTab === 'shifts' && (
+            <div className="space-y-4">
+              {/* Sub-view switcher: Placements Matrix vs Live Active Classes Grid */}
+              <div className="flex items-center justify-between bg-white rounded-2xl border border-slate-200 p-2 shadow-2xs">
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setShiftsSubView('placements')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
+                      shiftsSubView === 'placements'
+                        ? 'bg-teal-600 text-white shadow-2xs'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    {language === 'he' ? 'לוח שיבוצים ושעות שהות' : 'Placements & Hours Matrix'}
+                  </button>
 
-            <div className="p-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between">
-              <span>
-                {language === 'he' ? 'מוצגים 5 מתוך 52 אנשי צוות' : 'Showing 5 of 52 rostered staff'}
-              </span>
-              <button
-                type="button"
-                onClick={() => showToast(language === 'he' ? 'נטענו עוד 15 רשומות' : 'Loaded 15 more staff members', 'info')}
-                className="font-medium text-teal-700 hover:underline"
-              >
-                {language === 'he' ? 'טען רשומות נוספות' : 'Load more rows'}
-              </button>
+                  <button
+                    type="button"
+                    onClick={() => setShiftsSubView('live_grid')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 ${
+                      shiftsSubView === 'live_grid'
+                        ? 'bg-teal-600 text-white shadow-2xs'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>{language === 'he' ? 'מוקד פעילות וטיימר חי' : 'Live Operations & Timers'}</span>
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleOpenAddPlacement()}
+                  className="px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold border border-teal-200 flex items-center gap-1 transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>{language === 'he' ? 'שיבוץ חדש' : 'New Placement'}</span>
+                </button>
+              </div>
+
+              {shiftsSubView === 'placements' ? (
+                <PlacementsTab
+                  placements={placements}
+                  onAddPlacement={() => handleOpenAddPlacement()}
+                  onEditPlacement={handleOpenEditPlacement}
+                  onDeletePlacement={handleDeletePlacement}
+                  onCallTeacher={handleCallTeacher}
+                  onCallKindergarten={handleCallKindergarten}
+                />
+              ) : (
+                <ContractorOverviewGrid
+                  classes={classes}
+                  onCallTeacher={handleCallTeacher}
+                  onCallKindergarten={handleCallKindergarten}
+                />
+              )}
             </div>
-          </div>
+          )}
+
+          {/* TAB 3: INSTRUCTORS CRUD (STAFF) */}
+          {contractorTab === 'staff' && (
+            <StaffCrudTab
+              instructors={instructors}
+              onAddInstructor={handleOpenAddInstructor}
+              onEditInstructor={handleOpenEditInstructor}
+              onDeleteInstructor={handleDeleteInstructor}
+              onQuickAssign={(instId) => handleOpenAddPlacement(instId, undefined)}
+              onCallTeacher={handleCallTeacher}
+            />
+          )}
+
+          {/* TAB 4: EDUCATIONAL FACILITIES CRUD (KINDERGARTENS) */}
+          {contractorTab === 'kindergartens' && (
+            <FacilitiesCrudTab
+              facilities={facilities}
+              onAddFacility={handleOpenAddFacility}
+              onEditFacility={handleOpenEditFacility}
+              onDeleteFacility={handleDeleteFacility}
+              onQuickAssign={(facId) => handleOpenAddPlacement(undefined, facId)}
+              onCallKindergarten={handleCallKindergarten}
+            />
+          )}
+
+          {/* TAB 5: FINANCIAL SPLIT MANAGER */}
+          {contractorTab === 'invoicing' && (
+            <FinancialSplitManager initialFinancials={initialTeacherFinancials} />
+          )}
+
+          {/* TAB 6: SETTINGS */}
+          {contractorTab === 'settings' && (
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4">
+              <div>
+                <h2 className="text-sm sm:text-base font-bold text-slate-900">
+                  {language === 'he' ? 'הגדרות חוזה ותעריפים עירוניים' : 'Contract & Municipal Rate Settings'}
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {language === 'he' ? 'פרמטרים קבועים להפעלת חוגי העשרה לשנת הלימודים תשפ״ו' : 'Standard operational parameters for enrichment enrichment 2026'}
+                </p>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-slate-800">{language === 'he' ? 'תעריף חיוב עירוני סטנדרטי' : 'Default Municipal Billing Rate'}</div>
+                    <div className="text-slate-500 text-[11px]">{language === 'he' ? 'קבוע בהסכם מכרז מול עיריית ת״א-יפו' : 'Fixed by municipal tender TLV'}</div>
+                  </div>
+                  <div className="font-mono font-bold text-sm text-teal-700">₪350 / {language === 'he' ? 'שיעור' : 'class'}</div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-slate-800">{language === 'he' ? 'פיצול שכר ברירת מחדל למדריך חדש' : 'Default Instructor Split Percentage'}</div>
+                    <div className="text-slate-500 text-[11px]">{language === 'he' ? 'ניתן לשינוי פרטני בלשונית פיצול שכר' : 'Customizable per instructor in Financial Split Manager'}</div>
+                  </div>
+                  <div className="font-mono font-bold text-sm text-teal-700">60% (₪210 / {language === 'he' ? 'שיעור' : 'class'})</div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-slate-800">{language === 'he' ? 'רדיוס גדר גיאוגרפית (Geofence)' : 'GPS Geofence Tolerance'}</div>
+                    <div className="text-slate-500 text-[11px]">{language === 'he' ? 'מרחק מרבי משער הגן לאימות מיקום אוטומטי' : 'Max allowable distance from school gate'}</div>
+                  </div>
+                  <div className="font-mono font-bold text-sm text-slate-700">100 {language === 'he' ? 'מטרים' : 'meters'}</div>
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
 
       </div>
+
+      {/* ---------------- Modals ---------------- */}
+
+      {/* Instructor Create / Edit Modal */}
+      <InstructorModal
+        isOpen={isInstructorModalOpen}
+        onClose={() => setIsInstructorModalOpen(false)}
+        onSave={handleSaveInstructor}
+        instructorToEdit={instructorToEdit}
+      />
+
+      {/* Facility Create / Edit Modal */}
+      <FacilityModal
+        isOpen={isFacilityModalOpen}
+        onClose={() => setIsFacilityModalOpen(false)}
+        onSave={handleSaveFacility}
+        facilityToEdit={facilityToEdit}
+      />
+
+      {/* Placement Modal (Assign instructor to facility with time) */}
+      <PlacementModal
+        isOpen={isPlacementModalOpen}
+        onClose={() => setIsPlacementModalOpen(false)}
+        onSave={handleSavePlacement}
+        instructors={instructors}
+        facilities={facilities}
+        placementToEdit={placementToEdit}
+        initialInstructorId={placementPrefillInstId}
+        initialFacilityId={placementPrefillFacId}
+      />
 
     </div>
   );

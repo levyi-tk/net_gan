@@ -203,24 +203,159 @@ export interface TranslationSchema {
     departureAndPickup: string;
   };
 
-  contractorView: {
-    welcomeTitle: string;
-    welcomeSubtitle: string;
-    agencyName: string;
-    activeInstructors: string;
-    activeInstructorsSub: string;
-    managedPreschools: string;
-    managedPreschoolsSub: string;
-    coverageRate: string;
-    coverageRateSub: string;
-    openSubstituteRequests: string;
-    openSubstituteRequestsSub: string;
-    quickOverviewHeader: string;
-    deploymentStatusHeader: string;
-    urgentNoticeTitle: string;
-    urgentNoticeDesc: string;
-    dispatchAction: string;
-  };
+    contractorView: {
+      welcomeTitle: string;
+      welcomeSubtitle: string;
+      agencyName: string;
+      activeInstructors: string;
+      activeInstructorsSub: string;
+      managedPreschools: string;
+      managedPreschoolsSub: string;
+      coverageRate: string;
+      coverageRateSub: string;
+      openSubstituteRequests: string;
+      openSubstituteRequestsSub: string;
+      quickOverviewHeader: string;
+      deploymentStatusHeader: string;
+      urgentNoticeTitle: string;
+      urgentNoticeDesc: string;
+      dispatchAction: string;
+
+      // Active Classes & Overview Grid
+      activeClassesTitle: string;
+      activeClassesSubtitle: string;
+      filterAllClasses: string;
+      filterLiveNow: string;
+      filterUpcoming: string;
+      filterCompleted: string;
+      filterAnomalies: string;
+      sessionActiveNow: string;
+      sessionCompleted: string;
+      sessionUpcoming: string;
+      verifiedAtLocation: string;
+      outOfRange: string;
+      pendingCheckIn: string;
+      distanceMeters: string;
+      timerRunning: string;
+      studentsAttending: string;
+      callTeacher: string;
+      callKindergarten: string;
+      viewDetails: string;
+      noClassesFound: string;
+
+      // Financial Split Manager
+      financialManagerTitle: string;
+      financialManagerSubtitle: string;
+      municipalFixedRate: string;
+      municipalRatePerClass: string;
+      teacherSplitPercentage: string;
+      teacherShare: string;
+      contractorShare: string;
+      teacherPayout: string;
+      contractorGrossMargin: string;
+      verifiedClasses: string;
+      totalBilledMunicipality: string;
+      totalTeacherPayroll: string;
+      totalContractorProfit: string;
+      profitMarginRate: string;
+      editSplit: string;
+      resetToDefault: string;
+      approvedForPayroll: string;
+      pendingApproval: string;
+      approvePayroll: string;
+      payrollApprovedToast: string;
+      splitUpdatedToast: string;
+      exportPayrollCsv: string;
+      rateDisclaimer: string;
+
+      // Operational Alerts
+      operationalAlertsTitle: string;
+      operationalAlertsSubtitle: string;
+      alertTypeLateCheckin: string;
+      alertTypeMissingLog: string;
+      alertTypeGpsAnomaly: string;
+      alertSeverityUrgent: string;
+      alertSeverityWarning: string;
+      alertAcknowledge: string;
+      alertResolve: string;
+      alertResolvedToast: string;
+      allAlertsResolved: string;
+      activeAlertsCount: string;
+      dispatchStandby: string;
+
+      // Instructor CRUD
+      instructorsTitle: string;
+      instructorsSubtitle: string;
+      addInstructor: string;
+      editInstructor: string;
+      deleteInstructor: string;
+      deleteInstructorConfirm: string;
+      instructorSavedToast: string;
+      instructorDeletedToast: string;
+      instructorNameHe: string;
+      instructorNameEn: string;
+      instructorRole: string;
+      instructorSubject: string;
+      instructorPhone: string;
+      instructorEmail: string;
+      instructorZone: string;
+      instructorStatus: string;
+      instructorSeniority: string;
+      instructorDefaultSplit: string;
+      assignedFacilities: string;
+      noInstructorsFound: string;
+
+      // Facility CRUD
+      facilitiesTitle: string;
+      facilitiesSubtitle: string;
+      addFacility: string;
+      editFacility: string;
+      deleteFacility: string;
+      deleteFacilityConfirm: string;
+      facilitySavedToast: string;
+      facilityDeletedToast: string;
+      facilityNameHe: string;
+      facilityNameEn: string;
+      facilityCity: string;
+      facilityAddressHe: string;
+      facilityAddressEn: string;
+      facilityContactPerson: string;
+      facilityContactPhone: string;
+      facilityContactEmail: string;
+      facilityAgeGroup: string;
+      facilityTotalStudents: string;
+      facilityGeofenceRadius: string;
+      facilityNotes: string;
+      assignedInstructors: string;
+      noFacilitiesFound: string;
+
+      // Assignments / Placements
+      placementsTitle: string;
+      placementsSubtitle: string;
+      addPlacement: string;
+      editPlacement: string;
+      deletePlacement: string;
+      deletePlacementConfirm: string;
+      placementSavedToast: string;
+      placementDeletedToast: string;
+      selectInstructor: string;
+      selectFacility: string;
+      dayOfWeek: string;
+      startTime: string;
+      endTime: string;
+      timeSlot: string;
+      noPlacementsFound: string;
+      filterDayAll: string;
+      recurrenceMode: string;
+      recurringWeekly: string;
+      specificDateSession: string;
+      selectSpecificDate: string;
+      selectWeekdays: string;
+      timeFormatNotice: string;
+      dateFormatNotice: string;
+      singleSessionBadge: string;
+      recurringBadge: string;
+    };
 
   municipalityView: {
     welcomeTitle: string;
@@ -456,7 +591,142 @@ export const translations: Record<'he' | 'en', TranslationSchema> = {
       deploymentStatusHeader: 'סטטוס מוסדות בטיפול שוטף',
       urgentNoticeTitle: 'התראת שיבוץ מיידית',
       urgentNoticeDesc: 'סייעת בגן אלונים דיווחה על מחלה ב-07:15. יש להפעיל ממלאת מקום מקבוצת כוננות מרכז.',
-      dispatchAction: 'שבץ ממלאת מקום כעת'
+      dispatchAction: 'שבץ ממלאת מקום כעת',
+
+      // Active Classes & Overview Grid
+      activeClassesTitle: 'מוקד שיעורים ופעילות שטח חיה',
+      activeClassesSubtitle: 'מעקב חי אחר מהלך השיעורים, טיימר פעילות נוכחי ואימות מיקום גדר גיאוגרפית (GPS)',
+      filterAllClasses: 'כל השיעורים',
+      filterLiveNow: 'במהלך שיעור כעת',
+      filterUpcoming: 'טרם התחילו',
+      filterCompleted: 'הסתיימו היום',
+      filterAnomalies: 'חריגות ומיקום',
+      sessionActiveNow: 'שיעור פעיל כעת',
+      sessionCompleted: 'הסתיים',
+      sessionUpcoming: 'מתוכנן בהמשך',
+      verifiedAtLocation: 'אימות מיקום מאושר',
+      outOfRange: 'מחוץ לטווח מורשה',
+      pendingCheckIn: 'ממתין לאימות מיקום',
+      distanceMeters: 'מ׳ מהגן',
+      timerRunning: 'רץ כעת',
+      studentsAttending: 'ילדים נוכחים',
+      callTeacher: 'התקשר למדריך/ה',
+      callKindergarten: 'התקשר לגן',
+      viewDetails: 'פרטי שיעור',
+      noClassesFound: 'לא נמצאו שיעורים התואמים את הסינון שנבחר.',
+
+      // Financial Split Manager
+      financialManagerTitle: 'ניהול פיצול שכר ותחשיב מפעיל מול רשות',
+      financialManagerSubtitle: 'תחשיב חלוקת שכר פר שיעור מאומת בין המדריך/ה לרווח הקבלן, ועדכון אחוזי שכר חי',
+      municipalFixedRate: 'תעריף שיעור עירוני קבוע',
+      municipalRatePerClass: '₪ לשיעור',
+      teacherSplitPercentage: 'אחוז שכר מדריך',
+      teacherShare: 'חלק המדריך/ה',
+      contractorShare: 'רווח גולמי קבלן',
+      teacherPayout: 'שכר מדריך מצטבר',
+      contractorGrossMargin: 'רווח מפעיל',
+      verifiedClasses: 'שיעורים מאומתים',
+      totalBilledMunicipality: 'סה״כ חיוב רשות מקומית',
+      totalTeacherPayroll: 'סה״כ שכר מדריכים לתשלום',
+      totalContractorProfit: 'סה״כ רווח גולמי מפעיל',
+      profitMarginRate: 'שיעור רווחיות מפעיל',
+      editSplit: 'ערוך פיצול',
+      resetToDefault: 'איפוס לברירת מחדל (60%)',
+      approvedForPayroll: 'אושר לתשלום',
+      pendingApproval: 'ממתין לאישור',
+      approvePayroll: 'אשר שכר',
+      payrollApprovedToast: 'שכר המדריך/ה אושר בהצלחה להעברה!',
+      splitUpdatedToast: 'אחוז הפיצול עודכן בהצלחה והחישובים רועננו!',
+      exportPayrollCsv: 'ייצוא דוח שכר וחיובים (CSV)',
+      rateDisclaimer: 'החישוב מתבסס על שיעורים שאומתו ב-GPS ונוכחות מלאה עפ״י חוזה העירייה.',
+
+      // Operational Alerts
+      operationalAlertsTitle: 'מוקד התראות וחריגות שטח',
+      operationalAlertsSubtitle: 'זיהוי מוקדם של איחורים, היעדר דיווח סיום שיעור וחריגות גדר גיאוגרפית (Geofence)',
+      alertTypeLateCheckin: 'התרעת איחור הגעה',
+      alertTypeMissingLog: 'יומן סיום שיעור חסר',
+      alertTypeGpsAnomaly: 'חריגת אימות GPS',
+      alertSeverityUrgent: 'דחוף',
+      alertSeverityWarning: 'אזהרה',
+      alertAcknowledge: 'אישור חריגה ידני',
+      alertResolve: 'סמן כטופל',
+      alertResolvedToast: 'ההתראה סומנה כטופלה והועברה לארכיון.',
+      allAlertsResolved: 'כל ההתראות טופלו בהצלחה! אין חריגות פעילות כעת.',
+      activeAlertsCount: 'התראות פעילות הדורשות מענה',
+      dispatchStandby: 'הפעל כונן/ית גיבוי',
+
+      // Instructor CRUD
+      instructorsTitle: 'ניהול מדריכים וצוות שטח (CRUD)',
+      instructorsSubtitle: 'הוספה, עריכה, שיבוץ ועדכון פרטי התקשרות ואחוזי שכר למדריכי העשרה',
+      addInstructor: 'הוסף מדריך/ה חדש/ה',
+      editInstructor: 'ערוך פרטי מדריך/ה',
+      deleteInstructor: 'מחק מדריך/ה',
+      deleteInstructorConfirm: 'האם אתה בטוח שברצונך למחוק מדריך זה? כל השיבוצים העתידיים יבוטלו.',
+      instructorSavedToast: 'פרטי המדריך/ה נשמרו בהצלחה במערכת!',
+      instructorDeletedToast: 'המדריך/ה הוסר/ה מהמערכת בהצלחה.',
+      instructorNameHe: 'שם מלא (עברית)',
+      instructorNameEn: 'שם מלא (אנגלית)',
+      instructorRole: 'תפקיד / הגדרת שכר',
+      instructorSubject: 'תחום התמחות והעשרה',
+      instructorPhone: 'טלפון נייד',
+      instructorEmail: 'כתובת דוא״ל',
+      instructorZone: 'מחוז שירות',
+      instructorStatus: 'סטטוס פעילות',
+      instructorSeniority: 'ותק וניסיון',
+      instructorDefaultSplit: 'אחוז שכר בסיס (%)',
+      assignedFacilities: 'מוסדות משובצים',
+      noInstructorsFound: 'לא נמצאו מדריכים התואמים את הסינון הנוכחי.',
+
+      // Facility CRUD
+      facilitiesTitle: 'ניהול מוסדות וגני ילדים (CRUD)',
+      facilitiesSubtitle: 'הקמה, עריכה וניהול פרטי מוסדות חינוך, אנשי קשר וגבולות גדר גיאוגרפית (GPS)',
+      addFacility: 'הוסף גן / מוסד חדש',
+      editFacility: 'ערוך פרטי גן',
+      deleteFacility: 'מחק מוסד',
+      deleteFacilityConfirm: 'האם אתה בטוח שברצונך להסיר מוסד זה? כל החוגים המשובצים בו יבוטלו.',
+      facilitySavedToast: 'פרטי המוסד החינוכי נשמרו בהצלחה במערכת!',
+      facilityDeletedToast: 'המוסד החינוכי הוסר מהמערכת בהצלחה.',
+      facilityNameHe: 'שם המוסד (עברית)',
+      facilityNameEn: 'שם המוסד (אנגלית)',
+      facilityCity: 'עיר / יישוב',
+      facilityAddressHe: 'כתובת מדויקת (עברית)',
+      facilityAddressEn: 'כתובת (אנגלית)',
+      facilityContactPerson: 'איש/אשת קשר (מנהלת גן / גננת מובילה)',
+      facilityContactPhone: 'טלפון איש קשר',
+      facilityContactEmail: 'דוא״ל המוסד',
+      facilityAgeGroup: 'שכבת גיל',
+      facilityTotalStudents: 'מספר ילדים רשומים',
+      facilityGeofenceRadius: 'רדיוס אימות GPS (במטרים)',
+      facilityNotes: 'הנחיות הגעה וקוד כניסה',
+      assignedInstructors: 'מדריכים פעילים',
+      noFacilitiesFound: 'לא נמצאו מוסדות חינוך התואמים את הסינון.',
+
+      // Assignments / Placements
+      placementsTitle: 'לוח שיבוצי שטח וזמני הגעה',
+      placementsSubtitle: 'הצמדת מדריך למוסד חינוכי, קביעת שעות שהות מדויקות, ימי פעילות ותחשיב שכר',
+      addPlacement: 'שבץ מדריך לגן חדש',
+      editPlacement: 'ערוך שיבוץ ושעות שהות',
+      deletePlacement: 'בטל שיבוץ',
+      deletePlacementConfirm: 'האם לבטל שיבוץ זה? המדריך והגן יעודכנו אוטומטית.',
+      placementSavedToast: 'השיבוץ נקלט בהצלחה והתווסף ללוח הזמנים השבועי!',
+      placementDeletedToast: 'השיבוץ בוטל בהצלחה.',
+      selectInstructor: 'בחר מדריך/ה',
+      selectFacility: 'בחר מוסד / גן יעד',
+      dayOfWeek: 'יום בשבוע',
+      startTime: 'שעת הגעה ותחילת שיעור',
+      endTime: 'שעת סיום שהות',
+      timeSlot: 'טווח שעות פעילות (24 שעות)',
+      noPlacementsFound: 'לא קיימים שיבוצים פעילים התואמים את הסינון.',
+      filterDayAll: 'כל המועדים והימים',
+      recurrenceMode: 'אופן קביעת המועד',
+      recurringWeekly: 'קבוע שבועי (לפי ימי פעילות)',
+      specificDateSession: 'תאריך ספציפי / שיעור חד-פעמי',
+      selectSpecificDate: 'תאריך השיעור (DD/MM/YYYY)',
+      selectWeekdays: 'ימי פעילות קבועים בשבוע',
+      timeFormatNotice: 'שעון 24 שעות ישראלי (לדוגמה: 14:00, 15:30)',
+      dateFormatNotice: 'תאריך בפורמט ישראלי מלא (יום/חודש/שנה)',
+      singleSessionBadge: 'תאריך ספציפי',
+      recurringBadge: 'קבוע שבועי'
     },
 
     municipalityView: {
@@ -692,7 +962,142 @@ export const translations: Record<'he' | 'en', TranslationSchema> = {
       deploymentStatusHeader: 'Facilities Status Overview',
       urgentNoticeTitle: 'Urgent Substitute Dispatch',
       urgentNoticeDesc: 'Aide at Alonim Kindergarten called in sick at 07:15. Dispatch on-call standby staff.',
-      dispatchAction: 'Dispatch Standby Now'
+      dispatchAction: 'Dispatch Standby Now',
+
+      // Active Classes & Overview Grid
+      activeClassesTitle: 'Live Class Operations & Field Oversight',
+      activeClassesSubtitle: 'Real-time monitoring of session progress, live timers, and geofence GPS verification',
+      filterAllClasses: 'All Classes',
+      filterLiveNow: 'In Session Now',
+      filterUpcoming: 'Upcoming',
+      filterCompleted: 'Completed Today',
+      filterAnomalies: 'Anomalies & GPS',
+      sessionActiveNow: 'Active Session',
+      sessionCompleted: 'Completed',
+      sessionUpcoming: 'Scheduled',
+      verifiedAtLocation: 'Verified at Location',
+      outOfRange: 'Out of Range',
+      pendingCheckIn: 'Pending Verification',
+      distanceMeters: 'm from gate',
+      timerRunning: 'Live Timer',
+      studentsAttending: 'Children Present',
+      callTeacher: 'Call Instructor',
+      callKindergarten: 'Call Kindergarten',
+      viewDetails: 'Session Details',
+      noClassesFound: 'No classes match the selected filter criteria.',
+
+      // Financial Split Manager
+      financialManagerTitle: 'Financial Split & Contractor Invoicing Manager',
+      financialManagerSubtitle: 'Real-time revenue split calculator between instructor pay & agency gross profit based on verified sessions',
+      municipalFixedRate: 'Fixed Municipal Rate / Class',
+      municipalRatePerClass: '₪ / class',
+      teacherSplitPercentage: 'Teacher Share %',
+      teacherShare: 'Teacher Share',
+      contractorShare: 'Contractor Margin',
+      teacherPayout: 'Total Teacher Payout',
+      contractorGrossMargin: 'Agency Gross Margin',
+      verifiedClasses: 'Verified Sessions',
+      totalBilledMunicipality: 'Total Municipal Invoiced',
+      totalTeacherPayroll: 'Total Teacher Payroll',
+      totalContractorProfit: 'Total Agency Gross Profit',
+      profitMarginRate: 'Agency Margin %',
+      editSplit: 'Edit Split',
+      resetToDefault: 'Reset to Default (60%)',
+      approvedForPayroll: 'Approved for Payout',
+      pendingApproval: 'Audit Pending',
+      approvePayroll: 'Approve Payout',
+      payrollApprovedToast: 'Instructor payout approved for bank disbursement!',
+      splitUpdatedToast: 'Percentage split updated and calculations refreshed!',
+      exportPayrollCsv: 'Export Payroll & Billing (CSV)',
+      rateDisclaimer: 'Calculations based on GPS-verified sessions and completed attendances under municipal SLA.',
+
+      // Operational Alerts
+      operationalAlertsTitle: 'Operational Alerts & Field Exceptions',
+      operationalAlertsSubtitle: 'Early detection of late check-ins, missing post-class logs, and GPS geofence breaches',
+      alertTypeLateCheckin: 'Late Check-In Alert',
+      alertTypeMissingLog: 'Missing Post-Class Log',
+      alertTypeGpsAnomaly: 'GPS Geofence Breach',
+      alertSeverityUrgent: 'Urgent',
+      alertSeverityWarning: 'Warning',
+      alertAcknowledge: 'Acknowledge Exception',
+      alertResolve: 'Mark Resolved',
+      alertResolvedToast: 'Alert marked as resolved and archived.',
+      allAlertsResolved: 'All operational alerts resolved! No active field exceptions.',
+      activeAlertsCount: 'Active alerts requiring operational attention',
+      dispatchStandby: 'Dispatch Standby Staff',
+
+      // Instructor CRUD
+      instructorsTitle: 'Instructor & Field Staff Management (CRUD)',
+      instructorsSubtitle: 'Create, update, assign, and manage contact information and compensation splits for instructors',
+      addInstructor: 'Add New Instructor',
+      editInstructor: 'Edit Instructor Details',
+      deleteInstructor: 'Delete Instructor',
+      deleteInstructorConfirm: 'Are you sure you want to delete this instructor? All scheduled classes will be unassigned.',
+      instructorSavedToast: 'Instructor profile saved successfully!',
+      instructorDeletedToast: 'Instructor deleted from system successfully.',
+      instructorNameHe: 'Full Name (Hebrew)',
+      instructorNameEn: 'Full Name (English)',
+      instructorRole: 'Staff Role / Designation',
+      instructorSubject: 'Specialty & Discipline',
+      instructorPhone: 'Mobile Phone',
+      instructorEmail: 'Email Address',
+      instructorZone: 'Service District',
+      instructorStatus: 'Active Status',
+      instructorSeniority: 'Seniority Level',
+      instructorDefaultSplit: 'Base Compensation Share (%)',
+      assignedFacilities: 'Assigned Facilities',
+      noInstructorsFound: 'No instructors match your current filter.',
+
+      // Facility CRUD
+      facilitiesTitle: 'Educational Facilities & Preschools (CRUD)',
+      facilitiesSubtitle: 'Register, edit, and configure kindergarten facilities, contacts, and geofence GPS boundaries',
+      addFacility: 'Add Preschool / Facility',
+      editFacility: 'Edit Facility Details',
+      deleteFacility: 'Delete Facility',
+      deleteFacilityConfirm: 'Are you sure you want to delete this facility? All scheduled classes will be removed.',
+      facilitySavedToast: 'Facility registered and saved successfully!',
+      facilityDeletedToast: 'Educational facility removed from system.',
+      facilityNameHe: 'Facility Name (Hebrew)',
+      facilityNameEn: 'Facility Name (English)',
+      facilityCity: 'City / Municipality',
+      facilityAddressHe: 'Street Address (Hebrew)',
+      facilityAddressEn: 'Street Address (English)',
+      facilityContactPerson: 'On-Site Contact (Lead Teacher / Director)',
+      facilityContactPhone: 'Contact Phone',
+      facilityContactEmail: 'Contact Email',
+      facilityAgeGroup: 'Age Cohort',
+      facilityTotalStudents: 'Enrolled Children Count',
+      facilityGeofenceRadius: 'GPS Geofence Radius (meters)',
+      facilityNotes: 'Access Notes & Gate Entry Code',
+      assignedInstructors: 'Active Instructors',
+      noFacilitiesFound: 'No educational facilities match your filter.',
+
+      // Assignments / Placements
+      placementsTitle: 'Field Placements & Time Schedule',
+      placementsSubtitle: 'Assign instructors to specific educational facilities, scheduled hours, and subject allocations',
+      addPlacement: 'Assign Instructor to Facility',
+      editPlacement: 'Edit Placement & Time Hours',
+      deletePlacement: 'Unassign / Cancel Placement',
+      deletePlacementConfirm: 'Are you sure you want to cancel this placement assignment?',
+      placementSavedToast: 'Instructor placement assigned and added to active schedule!',
+      placementDeletedToast: 'Placement unassigned successfully.',
+      selectInstructor: 'Select Instructor',
+      selectFacility: 'Select Educational Facility',
+      dayOfWeek: 'Day of Week',
+      startTime: 'Arrival & Class Start Time',
+      endTime: 'Departure Time',
+      timeSlot: 'Time Slot (24h clock)',
+      noPlacementsFound: 'No placement assignments found for this filter.',
+      filterDayAll: 'All Days & Dates',
+      recurrenceMode: 'Schedule Frequency',
+      recurringWeekly: 'Weekly Recurring (on selected weekdays)',
+      specificDateSession: 'Specific Date / Single Session',
+      selectSpecificDate: 'Session Date (DD/MM/YYYY)',
+      selectWeekdays: 'Recurring Weekday(s)',
+      timeFormatNotice: 'Israeli 24h clock format (e.g. 14:00, 15:30)',
+      dateFormatNotice: 'Israeli date format (DD/MM/YYYY)',
+      singleSessionBadge: 'Single Date',
+      recurringBadge: 'Weekly'
     },
 
     municipalityView: {
